@@ -1,0 +1,8 @@
+
+<div id="drawing">
+    <my-drawing></my-drawing>
+</div>
+
+<div id="app">
+  <my-app><my-app>
+</div>
