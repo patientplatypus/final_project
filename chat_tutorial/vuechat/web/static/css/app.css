@@ -1,1 +1,7 @@
 /* This file is for your main application css. */
+#canvas {
+  background: white;
+  border-radius: 3px;
+  border-color: black;
+  border-style: solid;
+}

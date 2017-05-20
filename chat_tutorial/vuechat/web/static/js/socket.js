@@ -64,23 +64,28 @@ import {Socket} from "phoenix"
 import Vue from 'vue'
 import MyApp from "../components/my-app.vue"
 import MyDrawing from "../components/my-drawing.vue"
+import MyColors from "../components/my-colors.vue"
+import MyUsername from "../components/my-username.vue"
 
+// var token = $('meta[name=channel_token]').attr('content');
 
-let socket = new Socket("/socket", {params: {token: window.userToken}})
+let socket = new Socket("/socket")
+
+// console.log("token is", token);
 
 socket.connect()
 
-
-let socket2 = new Socket("/socket", {params: {token: window.userToken}})
+let socket2 = new Socket("/socket")
 
 socket2.connect()
 
 
 
-// Create the main component
+
+const Bus = new Vue({});
+
 Vue.component('my-app', MyApp)
 
-// And create the top-level view model:
 new Vue({
   el: '#app',
   mounted() {
@@ -92,18 +97,78 @@ new Vue({
     this.channel.join()
       .receive("ok", response => { console.log("Joined successfully", response) })
       .receive("error", response => { console.log("Unable to join", response) })
+
+    Bus.$on('emitUsername', (username) => {
+      // console.log("inside socket.js/my-drawing and emitString is ", emitString);
+      console.log('value of username inside bus.on, ', username);
+      this.useUsername = username;
+      // console.log('inside socket.js/my-drawing and this.useColor after set is ', this.useColor);
+    });
+
   },
   data() {
     return {
       channel: null,
-      messages: []
+      messages: [],
+      useUsername: ''
     }
   },
   render(createElement) {
-    return createElement(MyApp, {})
+    return createElement(MyApp, {
+      props: {
+        'useThisUsername': this.useUsername
+      }
+    })
   }
 });
 
+
+Vue.component('my-colors', MyColors)
+
+new Vue({
+  el: '#colors',
+  data: function() {
+    return {
+      colorSent: '',
+      sizeSent: 0
+    }
+  },
+  watch: {
+    'colorSent': function() {
+      Bus.$emit('emitColorSelection', this.colorSent);
+      // console.log('value of emitColorSelection ', this.colorSent);
+      // console.log('inside my-colors parent and this.colorsent, ', this.colorSent, " tihs.sizeSent ", this.sizeSent);
+    },
+    'sizeSent': function(){
+      Bus.$emit('emitSizeSelection', this.sizeSent);
+    }
+
+  },
+  render(createElement){
+    return createElement(MyColors, {})
+  }
+});
+
+Vue.component("my-username", MyUsername)
+
+new Vue({
+  el: '#username',
+  data: function(){
+    return{
+      usernameSent: ''
+    }
+  },
+  watch: {
+    'usernameSent': function(){
+      console.log('inside usernameSent watch in parent');
+      console.log('value of usernameSent before bus emit ', this.usernameSent);
+      Bus.$emit('emitUsername', this.usernameSent);
+    }
+  },
+  render(createElement){
+    return createElement(MyUsername, {})
+  }
+})
 
 
 Vue.component('my-drawing', MyDrawing)
@@ -113,127 +178,41 @@ new Vue({
   mounted() {
     this.channel2 = socket.channel("room:lobby2", {});
     this.channel2.on("new_img", payload => {
-      console.log('inside channel2.on');
-      console.log('payload in channel2.on ', payload.body);
+      // console.log('inside channel2.on');
+      // console.log('payload in channel2.on ', payload.body);
       payload.received_at = Date();
       this.canvases = (payload.body);
-      console.log('this.canvases after setting payload', this.canvases);
+      // console.log('this.canvases after setting payload', this.canvases);
     });
     this.channel2.join()
       .receive("ok", response => { console.log("Joined successfully", response) })
       .receive("error", response => { console.log("Unable to join", response) })
+
+    Bus.$on('emitColorSelection', (emitString) => {
+      // console.log("inside socket.js/my-drawing and emitString is ", emitString);
+      this.useColor = emitString;
+      // console.log('inside socket.js/my-drawing and this.useColor after set is ', this.useColor);
+    });
+    Bus.$on('emitSizeSelection', (sizeString) => {
+      this.useSize = sizeString;
+    });
+
   },
   data() {
     return {
       channel2: null,
-      canvases: []
+      canvases: [],
+      useColor: 'rgba(255, 0, 0, 1)',
+      useSize: "1"
     }
   },
   render(createElement) {
-    return createElement(MyDrawing, {})
+    return createElement(MyDrawing, {
+      props: {
+        'useThisColor': this.useColor,
+        'useThisCanvas': this.canvases,
+        'useThisSize': this.useSize
+      }
+    })
   }
 });
-
-
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-// data: function () {
-//     return {
-//       mouse: {
-//         current: {
-//           x: 0,
-//           y: 0
-//         },
-//         previous: {
-//           x: 0,
-//           y: 0
-//         },
-//         down: false
-//       }
-//     }
-//   },
-//   computed: {
-//     currentMouse: function () {
-//       var c = document.getElementById("canvas");
-//       var rect = c.getBoundingClientRect();
-//
-//       return {
-//         x: this.mouse.current.x - rect.left,
-//         y: this.mouse.current.y - rect.top
-//       }
-//     }
-//   },
-//   template: '<canvas id="canvas" v-on:mousedown="handleMouseDown" v-on:mouseup="handleMouseUp" v-on:mousemove="handleMouseMove" width="800px" height="800px"></canvas>',
-//   methods: {
-//     draw: function (event) {
-//
-//
-//       // requestAnimationFrame(this.draw);
-//      if (this.mouse.down ) {
-//        var c = document.getElementById("canvas");
-//
-//     var ctx = c.getContext("2d");
-//
-//        ctx.clearRect(0,0,800,800);
-//
-//
-//     ctx.lineTo(this.currentMouse.x, this.currentMouse.y);
-//        ctx.strokeStyle ="#F63E02";
-//        ctx.lineWidth = 2;
-//     ctx.stroke()
-//      }
-//
-//     },
-//     handleMouseDown: function (event) {
-//       this.mouse.down = true;
-//       this.mouse.current = {
-//         x: event.pageX,
-//         y: event.pageY
-//       }
-//
-//             var c = document.getElementById("canvas");
-//       var ctx = c.getContext("2d");
-//
-//       ctx.moveTo(this.currentMouse.x, this.currentMouse.y)
-//
-//
-//     },
-//         handleMouseUp: function () {
-//       this.mouse.down = false;
-//     },
-//     handleMouseMove: function (event) {
-//
-//       this.mouse.current = {
-//         x: event.pageX,
-//         y: event.pageY
-//       }
-//
-//       this.draw(event)
-//
-//     }
-//   },
-//                   ready: function () {
-//
-//                     var c = document.getElementById("canvas");
-//     var ctx = c.getContext("2d");
-//                     ctx.translate(0.5, 0.5);
-//                     ctx.imageSmoothingEnabled= false;
-//   // this.draw();
-// }
-// })
-//
-//
-//
-// var app = new Vue({
-//   el: "#app",
-//   data: {},
-// })

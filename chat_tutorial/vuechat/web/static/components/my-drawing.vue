@@ -3,10 +3,6 @@
   <div class="my-drawing">
     <canvas id="canvas" v-on:mousedown="handleMouseDown" v-on:mouseup="handleMouseUp" v-on:mousemove="handleMouseMove" width="800px" height="800px"></canvas>
 
-    <ul v-for="canvas in canvases">
-    </ul>
-
-    <p>hello there sailor</p>
   </div>
 </template>
 
@@ -26,14 +22,60 @@ export default {
         down: false
       },
       canvasImage:[],
-      channelCanvas:this.$parent.canvases
+      colorToUse:"rgba(255,0,0,1)",
+      sizeToUse: 1
+    }
+  },
+  props: {
+    useThisColor: {
+      type: String
+    },
+    useThisCanvas: {
+      type: Array
+    },
+    useThisSize: {
+      type: String
+    }
+  },
+  watch: {
+    useThisSize (n,o){
+      console.log('useThisSize watch, ', n,o);
+      this.sizeToUse=n;
+    },
+    canvasImage (n,o){
+      console.log("canvasImage watch, ", n[0], o[0]);
+    },
+    useThisColor (n, o) {
+      console.log("useThisColor watch, ", n, o) // n is the new value, o is the old value.
+      this.colorToUse=n;
+    },
+    useThisCanvas (newCanvas, oldCanvas) {
+      console.log("useThisCanvas watch, ", newCanvas[0], oldCanvas[0]) // n is the new value, o is the old value.
+
+        var looplength = newCanvas.length;
+
+        if (looplength>1){
+          var c = document.getElementById('canvas');
+          var ctx = c.getContext('2d');
+          // ctx.clearRect(0,0,800,800);
+          ctx.beginPath();
+          ctx.moveTo(newCanvas[0][0], newCanvas[0][1]);
+
+          for (var x = 0; x<looplength; x++){
+            // ctx.beginPath();
+            // ctx.clearRect(0,0,800,800);
+            // ctx.beginPath();
+            ctx.lineTo(newCanvas[x][0], newCanvas[x][1]);
+            console.log('newCanvas[x][3] is ', newCanvas[x][3]);
+            ctx.strokeStyle = newCanvas[x][2];
+            ctx.lineWidth = newCanvas[x][3];
+            ctx.stroke();
+            // ctx.closePath();
+          }
+        }
     }
   },
   computed: {
-    canvases() {
-      console.log('hey there doggies');
-      return this.$parent.canvases
-    },
     currentMouse: function () {
       var c = document.getElementById("canvas");
       var rect = c.getBoundingClientRect();
@@ -43,91 +85,58 @@ export default {
         y: this.mouse.current.y - rect.top
       }
     },
-    // canvases() {
-    //   return{console.log('from the socket, this.$parent.canvases, ', this.$parent.canvases)}
-    //   // return this.$parent.messages
-    // },
+    previousMouse: function () {
+      var c = document.getElementById("canvas");
+      var rect = c.getBoundingClientRect();
+
+      return {
+        x: this.mouse.previous.x - rect.left,
+        y: this.mouse.previous.y - rect.top
+      }
+    }
   },
   methods: {
     draw: function (event) {
-     if (this.mouse.down ) {
+     if (this.mouse.down) {
        var c = document.getElementById("canvas");
        var ctx = c.getContext("2d");
-       ctx.clearRect(0,0,800,800);
+      //  ctx.clearRect(0,0,800,800);
        ctx.lineTo(this.currentMouse.x, this.currentMouse.y);
-       ctx.strokeStyle ="#F63E02";
-       ctx.lineWidth = 2;
+       console.log('right before strokeStyle (where you set color) and this.sizeToUse is ', this.sizeToUse);
+       ctx.strokeStyle = this.colorToUse;
+       ctx.lineWidth = this.sizeToUse;
        ctx.stroke();
-       var dataArray = [this.currentMouse.x, this.currentMouse.y, "#F63E02", 2];
+       var dataArray = [this.currentMouse.x, this.currentMouse.y, this.colorToUse, this.sizeToUse];
        this.$set(this.canvasImage, 'myCanvas', this.canvasImage.push(dataArray));
-      //  console.log(dataArray);
-
      }
     },
-    // canvases() {
-    //   var c = document.getElementById("myCanvas");
-    //   var ctx = c.getContext("2d");
-    //   console.log(this.$parent.canvases);
-    //   ctx.putImageData(this.$parent.canvases, 800, 800);
-    // },
     handleMouseDown: function (event) {
-      this.mouse.down = true;
       this.mouse.current = {
         x: event.pageX,
         y: event.pageY
       }
       var c = document.getElementById("canvas");
       var ctx = c.getContext("2d");
-      ctx.moveTo(this.currentMouse.x, this.currentMouse.y)
+      ctx.beginPath();
+      ctx.moveTo(this.currentMouse.x, this.currentMouse.y);
+      // if (this.mouse.down===false){
+      //   ctx.beginPath();
+      // }
+      this.mouse.down = true;
     },
     handleMouseUp: function (event) {
       this.mouse.down = false;
-      // console.log("this.canvasImage,", this.canvasImage);
+      // var c = document.getElementById("canvas");
+      // var ctx = c.getContext("2d");
+      // ctx.closePath();
       this.$parent.channel2.push('new_img', {body:this.canvasImage});
-      // console.log("this.canvasImage after clear ,", this.canvasImage);
-      // console.log("this.canvasImage.length, ", this.canvasImage.length);
-
-
       var looplength = this.canvasImage.length;
-      for(var x=0; x<looplength; x++){
-        // this.$delete(this.canvasImage,x);
-        // this.canvasImage.splice(x, 1)
+      for(var x=0; x<=looplength; x++){
         this.canvasImage = this.canvasImage.splice(x,1);
-        // console.log("this.canvasImage at index, ", x, "is ", this.canvasImage);
       }
-
-      // this.$set(this.canvasImage, 'myCanvas',[]);
-      // pop()
-
-      setTimeout(function(){
-        // console.log("inside setTimeout in handleMouseUp");
-        // console.log("this.$parent.canvases in handleMouseUp", this.parent);
-        console.log(this.channelCanvas);
-      },1000);
-
-      // console.log("this.canvasImage after delete for, ", this.canvasImage);
+      console.log("after for loop in handleMouseUp and new empy this.canvasImage has length", this.canvasImage.length);
 
     },
-    props: ['canvases'],
-    watch: {
-      'canvases': function(val, oldVal) {
-        this.$nextTick(function() {
-          console.log('inside watch and val is ', val);
-        });
-      }
-    },
-    // watch: {
-    //   this.$parent.canvases:  {
-    //     handler:function (val, oldVal){
-    //         console.log('new: %s, old: %s', val, oldVal)
-    //     },
-    //     deep: true
-    //   }
-    // },
-    // sendImage: function () {
-    //   console.log('inside sendImage: this.canvasImage.imageObject', this.canvasImage.imageObject);
-    //   this.$parent.channel2.push("new_img", { body: this.canvasImage.imageObject })
-    // },
     handleMouseMove: function (event) {
       this.mouse.current = {
         x: event.pageX,
@@ -141,47 +150,6 @@ export default {
     var ctx = c.getContext("2d");
     ctx.translate(0.5, 0.5);
     ctx.imageSmoothingEnabled= false;
-  },
-  updated: function(){
-    console.log("hey you updated");
-    console.log('inside update and this.$parent.canvases is', this.$parent.canvases);
-    // #016FB9
-
-    // var c = document.getElementById("canvas");
-    // var ctx = c.getContext("2d");
-    // ctx.clearRect(0,0,800,800);
-    // ctx.lineTo(this.currentMouse.x, this.currentMouse.y);
-    // ctx.strokeStyle ="#F63E02";
-    // ctx.lineWidth = 2;
-    // ctx.stroke();
-    // var dataArray = [this.currentMouse.x, this.currentMouse.y, "#F63E02", 2];
-    // this.$set(this.canvasImage, 'myCanvas', this.canvasImage.push(dataArray));
-
-
-    // ctx.clearRect(0,0,800,800);
-
-    var looplength = this.$parent.canvases.length;
-
-    if (looplength>1){
-      var c = document.getElementById('canvas');
-      var ctx = c.getContext('2d');
-      ctx.clearRect(0,0,800,800);
-      ctx.moveTo(this.$parent.canvases[0][0], this.$parent.canvases[0][1]);
-
-      for (var x = 1; x<looplength; x++){
-        // console.log('index x is ', x, " lineto x-value, ", this.$parent.canvases[x][0], " lineto y-value", this.$parent.canvases[x][1]);
-        ctx.clearRect(0,0,800,800);
-        ctx.lineTo(this.$parent.canvases[x][0], this.$parent.canvases[x][1]);
-        ctx.linewidth = 2;
-        ctx.strokeStyle = "#016FB8";
-        ctx.stroke();
-      }
-    }
-
-
-
-
-
 
   }
 }

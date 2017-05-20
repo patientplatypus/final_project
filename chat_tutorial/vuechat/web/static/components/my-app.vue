@@ -3,7 +3,7 @@
     <h1>Vuechat</h1>
     <ul v-for="message in messages">
       <li>
-        <small>{{message.received_at}}</small>: {{message.body}}
+        <small>{{usernameToUse}}</small>: {{message.body}}
       </li>
     </ul>
     <input type="text" v-model="message" v-on:keyup.13="sendMessage">
@@ -15,12 +15,26 @@
 export default {
   data() {
     return {
-      message: ""
+      message: "",
+      usernameToUse: "anon",
+      tenmessages: ''
+    }
+  },
+  props: {
+    useThisUsername: {
+      type: String
+    }
+  },
+  watch: {
+    useThisUsername (n,o){
+      console.log('useThisUsername watch, ', n,o);
+      this.usernameToUse=n;
     }
   },
   computed: {
     messages() {
-      return this.$parent.messages
+      this.tenmessages = this.$parent.messages.slice(-10);
+      return this.tenmessages
     }
   },
   methods: {

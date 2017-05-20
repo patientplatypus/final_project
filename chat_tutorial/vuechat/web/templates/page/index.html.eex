@@ -3,6 +3,14 @@
     <my-drawing></my-drawing>
 </div>
 
+<div id="colors">
+    <my-colors></my-colors>
+</div>
+
+<div id="username">
+    <my-username></my-username>
+</div>
+
 <div id="app">
   <my-app><my-app>
 </div>
