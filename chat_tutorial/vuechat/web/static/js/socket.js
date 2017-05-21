@@ -66,6 +66,8 @@ import MyApp from "../components/my-app.vue"
 import MyDrawing from "../components/my-drawing.vue"
 import MyColors from "../components/my-colors.vue"
 import MyUsername from "../components/my-username.vue"
+import MyHotdogtimer from '../components/my-hotdogtimer.vue'
+// import '../css/app.css'
 
 // var token = $('meta[name=channel_token]').attr('content');
 
@@ -78,6 +80,10 @@ socket.connect()
 let socket2 = new Socket("/socket")
 
 socket2.connect()
+
+let socket3 = new Socket("/socket")
+
+socket3.connect()
 
 
 
@@ -171,6 +177,61 @@ new Vue({
 })
 
 
+
+Vue.component("my-hotdogtimer", MyHotdogtimer)
+
+new Vue({
+  el: '#hotdogtimer',
+  mounted() {
+    this.channel3 = socket3.channel("room:lobby3", {});
+    this.channel3.on("timer_start", payload => {
+      payload.received_at = Date();
+      this.timer = payload;
+    });
+    this.channel3.join()
+      .receive("ok", response => { console.log("Joined successfully", response) })
+      .receive("error", response => { console.log("Unable to join", response) })
+
+    Bus.$on('emitTimer', (timer) => {
+      // console.log("inside socket.js/my-drawing and emitString is ", emitString);
+      // console.log('value of username inside bus.on, ', username);
+      this.timed = timer;
+      // console.log('inside socket.js/my-drawing and this.useColor after set is ', this.useColor);
+    });
+
+  },
+  data: function(){
+    return{
+      timer: null,
+      timed: null,
+      channel3: null,
+      canDraw: false
+    }
+  },
+  watch: {
+    'timer': function(){
+      // console.log('inside usernameSent watch in parent');
+      // console.log('value of usernameSent before bus emit ', this.usernameSent);
+      Bus.$emit('emitTimer', this.timer);
+    },
+    'canDraw': function(){
+      Bus.$emit('emitCanDraw', this.canDraw);
+    }
+  },
+  render(createElement){
+    return createElement(MyHotdogtimer, {
+      props: {
+        'useThisTime': this.timed
+      }
+    })
+  }
+})
+
+
+
+
+
+
 Vue.component('my-drawing', MyDrawing)
 
 new Vue({
@@ -196,14 +257,17 @@ new Vue({
     Bus.$on('emitSizeSelection', (sizeString) => {
       this.useSize = sizeString;
     });
-
+    Bus.$on('emitCanDraw', (canDraw) => {
+      this.canDraw = canDraw;
+    });
   },
   data() {
     return {
       channel2: null,
       canvases: [],
       useColor: 'rgba(255, 0, 0, 1)',
-      useSize: "1"
+      useSize: "1",
+      canDraw: false
     }
   },
   render(createElement) {
@@ -211,7 +275,8 @@ new Vue({
       props: {
         'useThisColor': this.useColor,
         'useThisCanvas': this.canvases,
-        'useThisSize': this.useSize
+        'useThisSize': this.useSize,
+        'canDraw': this.canDraw
       }
     })
   }

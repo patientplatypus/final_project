@@ -14,6 +14,24 @@
   </div>
 </template>
 
+<style scoped>
+  .my-username{
+    display: inline-block;
+    left: 0px;
+    top: 510px;
+    float: left;
+    color: black;
+    background-color: #0D2149;
+    margin:10px;
+    padding:10px;
+    width:auto;
+    position:absolute;
+  }
+  .usernameBlock h4{
+    color: #0D2149;
+  }
+</style>
+
 <script>
   export default {
     data: function () {

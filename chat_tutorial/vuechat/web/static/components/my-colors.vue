@@ -2,7 +2,7 @@
 
 <template>
   <div class="my-colors">
-    <div class="rBlock">
+    <div class='rBlock' v-bind:style='styleObject'>
       <p>Input the R value you want</p>
       <p>
         <input type="text" v-model="numberR">
@@ -36,6 +36,18 @@
   </div>
 </template>
 
+
+<style scoped>
+  .my-colors {
+    display: inline-block;
+    float: right;
+    width: 10%;
+  }
+  .rBlock, .bBlock, .gBlock, .sizeBlock{
+    display: inline;
+  }
+</style>
+
 <script>
   export default {
     data: function () {
@@ -44,7 +56,11 @@
         numberG: 0,
         numberB: 0,
         numberA: 1,
-        lineSize: 1
+        lineSize: 1,
+        styleObject: {
+          color: 'red',
+          fontSize: '13px'
+        }
       }
     },
     methods: {

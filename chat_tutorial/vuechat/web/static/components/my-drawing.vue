@@ -1,10 +1,28 @@
 
 <template>
   <div class="my-drawing">
-    <canvas id="canvas" v-on:mousedown="handleMouseDown" v-on:mouseup="handleMouseUp" v-on:mousemove="handleMouseMove" width="800px" height="800px"></canvas>
-
+    <div v-if="canDrawOK === true">
+      <canvas id="canvas" v-on:mousedown="handleMouseDown" v-on:mouseup="handleMouseUp" v-on:mousemove="handleMouseMove" width="800px" height="800px"></canvas>
+    </div>
+    <div v-else-if="canDrawOK === false">
+      <h1>Here are the rules of the game</h1>
+      <canvas id="canvas" width="800px" height="800px" style="zoom:50%"></canvas>
+    </div>
   </div>
 </template>
+
+<style scoped>
+  .my-drawing {
+    /*display: inline-block;*/
+    /*float: left;*/
+    display:flex;
+    /*width: 50%;*/
+    /*text-align: center;*/
+    align-items:center;
+    justify-content:center;
+    background-color: #0D2149;
+  }
+</style>
 
 <script>
 export default {
@@ -23,7 +41,8 @@ export default {
       },
       canvasImage:[],
       colorToUse:"rgba(255,0,0,1)",
-      sizeToUse: 1
+      sizeToUse: 1,
+      canDrawOK: false
     }
   },
   props: {
@@ -35,9 +54,26 @@ export default {
     },
     useThisSize: {
       type: String
+    },
+    canDraw: {
+      type: Boolean
     }
   },
   watch: {
+    canDraw (n,o){
+      console.log('canDraw watch ', n,o);
+      this.canDrawOK=n
+      // if (canDraw===false){
+      //   var myCanvas = document.getElementById('canvas');
+      //   var tempCanvas = document.createElement('canvas2');
+      //   tempCanvas.width = myCanvas.width;
+      //   tempCanvas.height = myCanvas.height;
+      //   tempCanvas.getContext('2d').drawImage(myCanvas, 0, 0);
+      //   myCanvas.width = 400;
+      //   myCanvas.height = 400;
+      //   myCanvas.getContext('2d').drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, myCanvas.width, myCanvas.height);
+      // }
+    },
     useThisSize (n,o){
       console.log('useThisSize watch, ', n,o);
       this.sizeToUse=n;
