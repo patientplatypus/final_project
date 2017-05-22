@@ -1,10 +1,16 @@
 <template>
   <div class="my-app">
     <div class='titlebar'>
-      <h1>NOTAHOTDOG</h1>
+      <h3>NOTAHOTDOG</h3>
     </div>
 
-    <input class='textinput' type="text" v-model="message" v-on:keyup.13="sendMessage" >
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+
+    <input class='textinput' type="text" placeholder="message the group :P" v-model="message" v-on:keyup.13="sendMessage" >
     <ul v-for="message in messages">
       <li>
          {{message.body}}
@@ -22,23 +28,36 @@
     background-color: #208AAE;
     color:#F9EBE0;
     text-align: left;
-    width: 20%;
+    width: 10%;
     height: 803px;
     margin: 0;
     padding: 0;
     position:relative;
   }
+  ul{
+    list-style-type: none;
+    text-align: left;
+    padding: 0;
+  }
+  li {
+    margin-bottom: -5px;
+    text-align: left;
+    margin-left: 5px;
+  }
   .titlebar{
     width: 100%;
     background-color: #F9EBE0;
   }
-  .my-app h1{
+  .my-app h3{
     color: #60492C;
     text-align: center;
   }
   .textinput{
     width: 100%;
-    background-color: #0D2149;
+    outline: none;
+    outline-width: 0;
+    border-width: 0;
+    background-color: #F9EBE0;
   }
 </style>
 
@@ -56,6 +75,11 @@ export default {
       type: String
     }
   },
+  // filters: {
+  //   reverse: function (array) {
+  //     return array.slice().reverse()
+  //   }
+  // },
   watch: {
     useThisUsername (n,o){
       console.log('useThisUsername watch, ', n,o);
@@ -65,7 +89,7 @@ export default {
   computed: {
     messages() {
       this.tenmessages = this.$parent.messages.slice(-10);
-      return this.tenmessages
+      return this.tenmessages.reverse();
     }
   },
   methods: {

@@ -13,25 +13,32 @@
 
       <div class="shownotahotdog">
         <h1>So the question you got to ask yourself punk....</h1>
-        <h1>...ishotdog? or isnothotdog?</h1>
+        <h2>...ishotdog? or isnothotdog?</h2>
           <button class="button" v-on:click='ishotdog'>ishotdog</button>
           <button class="button" v-on:click='isnothotdog'>isnothotdog</button>
-        <h1>Number who say ishotdog {{this.$parent.ishotdog}}</h1>
-        <h1>Number who say isnothotdog {{this.$parent.isnothotdog}}</h1>
-        <h1>Therefore percent hotdog is {{percenthotdog()}}</h1>
+        <h3>Number who say ishotdog {{this.$parent.ishotdog}}</h3>
+        <h3>Number who say isnothotdog {{this.$parent.isnothotdog}}</h3>
+        <h3>Therefore percent hotdog is {{percenthotdog()}}</h3>
       </div>
 
 
     </div>
     <div v-else-if="canDrawOK === null">
       <div class="rules">
-        <h1>Here are the rules of the game</h1>
-        <h2>Once someone presses the hotdogtimer button on the right
+        <h2>Here are the rules of the game</h2>
+        <h2>Once someone presses the hotdogtimer button on the left
         everyone will have 2 minutes to draw notahotdog. The goal of the game
-        is to draw whatever you want, as long as it's NOT a hotdog. Of course
-        there might be one or two total jabronis that will try and draw a hotdog
-        just to mess with everyone's head! Afterwards everyone gets to vote on whether
-        it's a hotdog or not, and has the option of playing again.
+        is to draw whatever you want, as long as it's NOT a hotdog.</h2>
+        <h3>example</h3>
+        <div class="imgleft">
+          <img src="http://i.imgur.com/eaYO3PB.jpg" alt="ishotdog" height="200" width="200">
+          <p> this ishotdog </p>
+        </div>
+        <div class="imgright">
+          <img src="http://i.imgur.com/uE6XxXB.jpg" alt="ishotdog" height="200" width="200">
+          <p> this isnothotdog (isplatypus)</p>
+        </div>
+        <h2> Of course there might be one or two total jabronis that will try and draw a hotdog just to mess with everyone's head! Afterwards everyone gets to vote on whether it's a hotdog or not, and has the option of playing again.
         Have fun!</h2>
       </div>
     </div>
@@ -48,10 +55,21 @@
     align-items:center;
     justify-content:center;
     background-color: #0D2149;
+    margin-top: 5px;
+    height: 800px;
+  }
+  .imgleft{
+    margin-right: 10%;
+    display: inline-block;
+    text-align: center;
+  }
+  .imgright{
+    margin-left: 10%;
+    display: inline-block;
+    text-align: center;
   }
   .rules {
     color: white;
-    height: 783px;
     text-align: center;
     padding-left: 10%;
     padding-right: 10%;
@@ -84,9 +102,10 @@ export default {
         down: false
       },
       canvasImage:[],
-      colorToUse:"rgba(255,0,0,1)",
-      sizeToUse: 1,
+      colorToUse:"rgba(0,0,0,1)",
+      sizeToUse: 2,
       canDrawOK: null,
+      canVote: true
     }
   },
   props: {
@@ -250,16 +269,22 @@ export default {
       this.draw(event)
     },
     ishotdog: function(){
-      this.$parent.channel4.push('hotdog_counter', {body:"ishotdog"});
+      if (this.canVote){
+        this.$parent.channel4.push('hotdog_counter', {body:"ishotdog"});
+        this.canVote = false;
+      }
     },
     isnothotdog: function(){
-      this.$parent.channel4.push('hotdog_counter', {body:"isnothotdog"});
+      if (this.canVote){
+        this.$parent.channel4.push('hotdog_counter', {body:"isnothotdog"});
+        this.canVote = false;
+      }
     },
     percenthotdog: function(){
       if (this.$parent.ishotdog===0 && this.$parent.ishotdog===0){
         return "_____"
       }else{
-        return 100*this.$parent.ishotdog/(this.$parent.ishotdog+this.$parent.isnothotdog)
+        return Math.round(100*this.$parent.ishotdog/(this.$parent.ishotdog+this.$parent.isnothotdog))
       }
     }
   },

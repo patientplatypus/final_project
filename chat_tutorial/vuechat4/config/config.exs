@@ -11,7 +11,7 @@ config :vuechat,
 
 # Configures the endpoint
 config :vuechat, Vuechat.Endpoint,
-  url: [host: "http://drawface.nanoapp.io"],
+  url: [host: "localhost"],
   secret_key_base: "pTK3kPbmejX34D4sh9+wINWvz+oNIvdUuVmeWcWYsWP6nFPu0PNd1Q/aN2IW/Rgy",
   render_errors: [view: Vuechat.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Vuechat.PubSub,

@@ -2,30 +2,49 @@
   <div class="my-username">
 
     <div class="usernameBlock">
-      <p>Input the username you want</p>
       <p>
-        <input type="text" v-model="username">
-        {{username}}
+        <input id="inputname" placeholder="what's your name? :D" type="text" v-model="username" v-on:keyup.13="sendUsername">
       </p>
     </div>
-
-    <button v-on:click='sendUsername'>Use this name!</button>
 
   </div>
 </template>
 
 <style scoped>
   .my-username{
-    display: inline-block;
+    /*display: inline-block;
     left: 0px;
     top: 510px;
     float: left;
-    color: black;
+    color: #F9EBE0;
     background-color: #0D2149;
     margin:10px;
     padding:10px;
     width:auto;
+    position:absolute;*/
+    display: inline-block;
+    top: 80px;
+    left: 8px;
+    /*float: left;
+    clear: both;*/
+    word-wrap: break-word;
+    background-color: transparent;
+    color:#F9EBE0;
+    text-align: left;
+    width: 9.86%;
+    margin: 0;
+    padding: 0;
     position:absolute;
+  }
+  #inputname{
+    background-color: #F9EBE0;
+    outline: none;
+    outline-width: 0;
+    border-width: 0;
+    text-align: left;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
   .usernameBlock h4{
     color: #0D2149;
@@ -48,6 +67,9 @@
         console.log('value of this.username ', this.username);
         this.$parent.usernameSent = this.username;
         console.log('value of this.$parent.usernameSent ', this.$parent.usernameSent);
+        this.username="";
+        var inputbox = document.getElementById('inputname');
+        inputbox.setAttribute('placeholder','name has been changed :)');
       }
    }
   }

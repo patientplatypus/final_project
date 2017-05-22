@@ -8,7 +8,8 @@
       <div v-if='this.$parent.canDraw === false'>
         <button v-on:click='startHotdog'>Re-start the HotDogTimer</button>
       </div>
-      <p>Countdown! {{minutesDisplay}}: {{secondsDisplay}} </p>
+      <p class='countdown'>Countdown!</p>
+      <p class='countdown'>{{minutesDisplay}}: {{secondsDisplay}} </p>
     </div>
 
   </div>
@@ -17,16 +18,31 @@
 <style scoped>
   .my-hotdogtimer{
     display: inline-block;
-    left: 35px;
-    top: 630px;
+    left: 0px;
+    top: 650px;
+    width: 100%;
     float: left;
     color: #0D2149;
     background-color: #60492C;
-    margin:10px;
-    padding:10px;
+    margin-left:1vw;
+    max-width: 7%;
+    /*padding:10px;*/
+    word-wrap: break-word;
     width:auto;
     position:absolute;
   }
+  .countdown{
+    color: red;
+    font-weight: bolder;
+    background-color: white;
+    padding: 5px;
+    text-align: center;
+    border-radius: 3px;
+  }
+  /*.countdownWord{
+    color: red;
+    background:
+  }*/
 </style>
 
 <script>
@@ -50,6 +66,13 @@
         // console.log('useThisSize watch, ', n,o);
         this.timeToUse=n;
         this.timeToEnd();
+      },
+      minutesDisplay: function(){
+        if (this.minutesDisplay(0)==="-"){
+          this.minutesDisplay = "TIMES";
+          this.secondsDisplay = "UP";
+          this.$parent.canDraw = false;
+        }
       }
     },
     methods: {
