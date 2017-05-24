@@ -1,0 +1,22 @@
+
+
+
+<div id="app">
+  <my-app><my-app>
+</div>
+
+<div id="username">
+    <my-username></my-username>
+</div>
+
+<div id="hotdogtimer">
+    <my-hotdogtimer></my-hotdogtimer>
+</div>
+
+<div id="colors">
+    <my-colors></my-colors>
+</div>
+
+<div id="drawing">
+    <my-drawing></my-drawing>
+</div>
